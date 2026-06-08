@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5001/api',
+  baseURL: 'https://pizza-hub-kd85.onrender.com/api',
 });
 
 // Add token to every request
