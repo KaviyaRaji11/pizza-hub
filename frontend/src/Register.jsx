@@ -71,33 +71,34 @@ function Register({ setShowLogin }) {
   };
 
   // Step 3: Complete registration
-  const completeRegistration = async () => {
-    if (!name || !password) {
-      setMessage('Please fill all fields');
-      return;
-    }
+  const handleRegister = async () => {
+  if (!name || !email || !password) {
+    setMessage('Please fill all fields');
+    return;
+  }
 
-    setLoading(true);
-    try {
-      const response = await fetch('http://localhost:5001/api/auth/complete-registration', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name, password })
-      });
-      const data = await response.json();
-      
-      if (response.ok) {
-        setMessage('Registration successful! Please login.');
-        setTimeout(() => setShowLogin(true), 2000);
-      } else {
-        setMessage(data.message);
-      }
-    } catch (error) {
-      setMessage('Error completing registration');
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  try {
+    const response = await fetch('https://pizza-api-8plw.onrender.com/api/auth/register-simple', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    });
+    const data = await response.json();
+    
+    if (response.ok) {
+      setMessage('Registration successful! Please login.');
+      setTimeout(() => setShowLogin(true), 2000);
+    } else {
+      setMessage(data.message);
     }
-  };
+  } catch (error) {
+    setMessage('Registration failed');
+  } finally {
+    setLoading(false);
+  }
+};
+   
 
   return (
     <div className="login-container">
@@ -167,7 +168,7 @@ function Register({ setShowLogin }) {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <button onClick={completeRegistration} disabled={loading}>
+            <button onClick={handleRegister} disabled={loading}>
               {loading ? 'Registering...' : 'Complete Registration'}
             </button>
           </>

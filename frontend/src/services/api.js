@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'https://pizza-hub-kd85.onrender.com/api',
+  baseURL: 'https://pizza-api-8plw.onrender.com/api',
 });
 
 // Add token to every request
@@ -19,7 +19,7 @@ export const login = (userData) => API.post('/auth/login', userData);
 export const verifyEmail = (token) => API.get(`/auth/verify/${token}`);
 export const forgotPassword = (email) => API.post('/auth/forgot-password', { email });
 export const resetPassword = (token, password) => API.post(`/auth/reset-password/${token}`, { password });
-
+export const registerSimple = (userData) => API.post('/auth/register-simple', userData);
 // ========== INVENTORY APIs ==========
 export const getInventory = () => API.get('/inventory');
 export const updateInventory = (id, data) => API.put(`/inventory/${id}`, data);
