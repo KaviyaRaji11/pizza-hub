@@ -30,5 +30,4 @@ export const getPizzasByCategory = (category) => API.get(`/pizzas/category/${cat
 
 export const createPaymentOrder = (amount) => API.post('/payment/create-order', { amount });
 export const verifyPayment = (paymentData) => API.post('/payment/verify', paymentData);
-
 export const testBackend = () => API.get('/');

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createOrder } from '../services/api';
+import { createOrder, createPaymentOrder, verifyPayment } from '../services/api';
 
 function Cart({ cart, setCart }) {
 
@@ -49,6 +49,97 @@ function Cart({ cart, setCart }) {
       alert('Cart is empty');
       return;
     }
+    const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
+const handlePayment = async () => {
+  if (name === '' || address === '' || phone === '') {
+    alert('Fill all details');
+    return;
+  }
+
+  if (cart.length === 0) {
+    alert('Cart is empty');
+    return;
+  }
+
+  try {
+    const orderRes = await createPaymentOrder(finalTotal);
+    const { id: order_id, amount } = orderRes.data;
+    
+    const isLoaded = await loadRazorpayScript();
+    if (!isLoaded) {
+      alert('Failed to load payment gateway');
+      return;
+    }
+    
+    const options = {
+      key: 'rzp_test_4X4JpLQyRS8nTw',
+      amount: amount,
+      currency: 'INR',
+      name: 'PizzaHub',
+      description: 'Pizza Order',
+      order_id: order_id,
+      handler: async (response) => {
+        const verifyRes = await verifyPayment({
+          order_id: response.razorpay_order_id,
+          payment_id: response.razorpay_payment_id,
+          signature: response.razorpay_signature
+        });
+        
+        if (verifyRes.data.success) {
+          const orderData = {
+            customPizza: {
+              base: { name: 'Regular Pizza', price: 0 },
+              sauce: { name: 'Standard', price: 0 },
+              cheese: { name: 'Mozzarella', price: 0 },
+              veggies: [],
+              meats: []
+            },
+            totalAmount: finalTotal,
+            deliveryAddress: { street: address, city: name, phone: phone },
+            menuItems: cart.map(item => ({
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price
+            }))
+          };
+          
+          await createOrder(orderData);
+          alert('Payment Successful! Order placed successfully! 🎉');
+          
+          setCart([]);
+          setName('');
+          setAddress('');
+          setPhone('');
+        } else {
+          alert('Payment verification failed');
+        }
+      },
+      prefill: {
+        name: name,
+        contact: phone
+      },
+      theme: {
+        color: '#E63946'
+      }
+    };
+    
+    const razorpay = new window.Razorpay(options);
+    razorpay.open();
+    
+  } catch (error) {
+    console.error('Payment error:', error);
+    alert('Payment failed: ' + error.message);
+  }
+};
 
     try {
       const orderData = {
