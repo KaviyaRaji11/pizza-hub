@@ -7,7 +7,6 @@ const razorpay = new Razorpay({
   key_secret: 'nJhJR8RPQUVoqt4a5UVPqbx1'
 });
 
-// Create order
 router.post('/create-order', async (req, res) => {
   try {
     const { amount } = req.body;
@@ -19,20 +18,12 @@ router.post('/create-order', async (req, res) => {
     const order = await razorpay.orders.create(options);
     res.json(order);
   } catch (error) {
-    console.error('Razorpay error:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Verify payment
 router.post('/verify', async (req, res) => {
-  try {
-    const { order_id, payment_id, signature } = req.body;
-    console.log('Payment verified:', { order_id, payment_id });
-    res.json({ success: true, message: 'Payment verified successfully!' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  res.json({ success: true });
 });
 
 module.exports = router;

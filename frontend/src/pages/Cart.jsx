@@ -39,7 +39,19 @@ function Cart({ cart, setCart }) {
     }
   };
 
-  const handlePlaceOrder = async () => {
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handlePayment = async () => {
+    console.log('Payment started');
+    
     if (name === '' || address === '' || phone === '') {
       alert('Fill all details');
       return;
@@ -49,134 +61,92 @@ function Cart({ cart, setCart }) {
       alert('Cart is empty');
       return;
     }
-    const loadRazorpayScript = () => {
-  return new Promise((resolve) => {
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-};
-
-const handlePayment = async () => {
-  if (name === '' || address === '' || phone === '') {
-    alert('Fill all details');
-    return;
-  }
-
-  if (cart.length === 0) {
-    alert('Cart is empty');
-    return;
-  }
-
-  try {
-    const orderRes = await createPaymentOrder(finalTotal);
-    const { id: order_id, amount } = orderRes.data;
-    
-    const isLoaded = await loadRazorpayScript();
-    if (!isLoaded) {
-      alert('Failed to load payment gateway');
-      return;
-    }
-    
-    const options = {
-  key: 'rzp_test_SzdDSSaq6K5LVU',  // ← Your new key
-  amount: amount,
-  currency: 'INR',
-  name: 'PizzaHub',
-  description: 'Pizza Order',
-  order_id: order_id,
-  // ... rest of the code
-      handler: async (response) => {
-        const verifyRes = await verifyPayment({
-          order_id: response.razorpay_order_id,
-          payment_id: response.razorpay_payment_id,
-          signature: response.razorpay_signature
-        });
-        
-        if (verifyRes.data.success) {
-          const orderData = {
-            customPizza: {
-              base: { name: 'Regular Pizza', price: 0 },
-              sauce: { name: 'Standard', price: 0 },
-              cheese: { name: 'Mozzarella', price: 0 },
-              veggies: [],
-              meats: []
-            },
-            totalAmount: finalTotal,
-            deliveryAddress: { street: address, city: name, phone: phone },
-            menuItems: cart.map(item => ({
-              name: item.name,
-              quantity: item.quantity,
-              price: item.price
-            }))
-          };
-          
-          await createOrder(orderData);
-          alert('Payment Successful! Order placed successfully! 🎉');
-          
-          setCart([]);
-          setName('');
-          setAddress('');
-          setPhone('');
-        } else {
-          alert('Payment verification failed');
-        }
-      },
-      prefill: {
-        name: name,
-        contact: phone
-      },
-      theme: {
-        color: '#E63946'
-      }
-    };
-    
-    const razorpay = new window.Razorpay(options);
-    razorpay.open();
-    
-  } catch (error) {
-    console.error('Payment error:', error);
-    alert('Payment failed: ' + error.message);
-  }
-};
 
     try {
-      const orderData = {
-        customPizza: {
-          base: { name: 'Regular Pizza', price: 0 },
-          sauce: { name: 'Standard', price: 0 },
-          cheese: { name: 'Mozzarella', price: 0 },
-          veggies: [],
-          meats: []
+      // Create Razorpay order
+      console.log('Creating order for amount:', finalTotal);
+      const orderRes = await createPaymentOrder(finalTotal);
+      console.log('Order response:', orderRes.data);
+      
+      const { id: order_id, amount } = orderRes.data;
+      
+      // Load Razorpay script
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        alert('Failed to load payment gateway');
+        return;
+      }
+      
+      const options = {
+        key: 'rzp_test_SzdDSSaq6K5LVU',
+        amount: amount,
+        currency: 'INR',
+        name: 'PizzaHub',
+        description: 'Pizza Order',
+        order_id: order_id,
+        handler: async (response) => {
+          console.log('Payment success:', response);
+          const verifyRes = await verifyPayment({
+            order_id: response.razorpay_order_id,
+            payment_id: response.razorpay_payment_id,
+            signature: response.razorpay_signature
+          });
+          
+          if (verifyRes.data.success) {
+            const orderData = {
+              customPizza: {
+                base: { name: 'Regular Pizza', price: 0 },
+                sauce: { name: 'Standard', price: 0 },
+                cheese: { name: 'Mozzarella', price: 0 },
+                veggies: [],
+                meats: []
+              },
+              totalAmount: finalTotal,
+              deliveryAddress: { street: address, city: name, phone: phone },
+              menuItems: cart.map(item => ({
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price
+              }))
+            };
+            
+            await createOrder(orderData);
+            alert('Payment Successful! Order placed successfully! 🎉');
+            
+            setCart([]);
+            setName('');
+            setAddress('');
+            setPhone('');
+          } else {
+            alert('Payment verification failed');
+          }
         },
-        totalAmount: finalTotal,
-        deliveryAddress: { street: address, city: name, phone: phone },
-        menuItems: cart.map(item => ({
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price
-        }))
+        prefill: {
+          name: name,
+          contact: phone
+        },
+        theme: {
+          color: '#E63946'
+        },
+        modal: {
+          ondismiss: function() {
+            console.log('Payment modal closed');
+          }
+        }
       };
       
-      await createOrder(orderData);
-      alert('Order Placed Successfully! 🎉');
-      
-      setCart([]);
-      setName('');
-      setAddress('');
-      setPhone('');
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
       
     } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to place order: ' + (error.response?.data?.message || error.message));
+      console.error('Payment error:', error);
+      alert('Payment failed: ' + error.message);
     }
   };
 
   if (cart.length === 0) {
     return (
-      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', background: '#FFFFFF', minHeight: '100vh', textAlign: 'center' }}>
+      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', textAlign: 'center' }}>
         <h1>🛒 Your Cart</h1>
         <p>No pizzas added. Go to Menu!</p>
       </div>
@@ -184,7 +154,7 @@ const handlePayment = async () => {
   }
 
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', background: '#FFFFFF', minHeight: '100vh' }}>
+    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
       <h1 style={{ textAlign: 'center' }}>🛒 Your Cart</h1>
 
       {cart.map((item, index) => (
@@ -195,8 +165,7 @@ const handlePayment = async () => {
           marginBottom: '15px',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          background: 'white'
+          alignItems: 'center'
         }}>
           <div>
             <h3 style={{ margin: 0 }}>{item.name}</h3>
@@ -259,7 +228,7 @@ const handlePayment = async () => {
         />
 
         <button
-          onClick={handlePlaceOrder}
+          onClick={handlePayment}
           style={{
             width: '100%',
             padding: '15px',
@@ -272,7 +241,7 @@ const handlePayment = async () => {
             cursor: 'pointer'
           }}
         >
-          Place Order 🍕
+          Pay ₹{finalTotal} & Place Order 💳
         </button>
       </div>
     </div>
