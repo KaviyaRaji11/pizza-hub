@@ -81,12 +81,13 @@ const handlePayment = async () => {
     }
     
     const options = {
-      key: 'rzp_test_4X4JpLQyRS8nTw',
-      amount: amount,
-      currency: 'INR',
-      name: 'PizzaHub',
-      description: 'Pizza Order',
-      order_id: order_id,
+  key: 'rzp_test_SzdDSSaq6K5LVU',  // ← Your new key
+  amount: amount,
+  currency: 'INR',
+  name: 'PizzaHub',
+  description: 'Pizza Order',
+  order_id: order_id,
+  // ... rest of the code
       handler: async (response) => {
         const verifyRes = await verifyPayment({
           order_id: response.razorpay_order_id,

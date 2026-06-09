@@ -3,8 +3,8 @@ const router = express.Router();
 const Razorpay = require('razorpay');
 
 const razorpay = new Razorpay({
-  key_id: 'rzp_test_4X4JpLQyRS8nTw',
-  key_secret: 'waVgBoM3LGiwykAafQQTqg0u'
+  key_id: 'rzp_test_SzdDSSaq6K5LVU',
+  key_secret: 'nJhJR8RPQUVoqt4a5UVPqbx1'
 });
 
 // Create order
@@ -19,13 +19,20 @@ router.post('/create-order', async (req, res) => {
     const order = await razorpay.orders.create(options);
     res.json(order);
   } catch (error) {
+    console.error('Razorpay error:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
 // Verify payment
 router.post('/verify', async (req, res) => {
-  res.json({ success: true });
+  try {
+    const { order_id, payment_id, signature } = req.body;
+    console.log('Payment verified:', { order_id, payment_id });
+    res.json({ success: true, message: 'Payment verified successfully!' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 module.exports = router;
