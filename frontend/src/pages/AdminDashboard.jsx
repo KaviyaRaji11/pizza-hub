@@ -43,7 +43,6 @@ function AdminDashboard() {
       setOrders(orders.map(order =>
         order._id === id ? { ...order, status: newStatus } : order
       ));
-      alert(`Order status updated to ${newStatus}`);
     } catch (error) {
       alert('Failed to update status');
     }
@@ -51,55 +50,30 @@ function AdminDashboard() {
 
   const lowStockItems = inventory.filter(item => item.stock < item.threshold);
 
-  if (loading) return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>Loading...</h2>;
+  if (loading) return <h2 style={{ textAlign: 'center', marginTop: '50px', background: '#FFFFFF', minHeight: '100vh', padding: '20px' }}>Loading...</h2>;
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
-      <h1 style={{ textAlign: 'center' }}>👑 Admin Dashboard</h1>
+    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px', background: '#FFFFFF', minHeight: '100vh' }}>
+      <h1 style={{ textAlign: 'center', color: '#E63946' }}>👑 Admin Dashboard</h1>
       
-      {/* Low Stock Warning */}
       {lowStockItems.length > 0 && (
         <div style={{ backgroundColor: '#ffcccc', padding: '15px', borderRadius: '10px', marginBottom: '20px', border: '1px solid red' }}>
           <h3 style={{ color: 'red', margin: 0 }}>⚠️ LOW STOCK ALERT!</h3>
           {lowStockItems.map(item => (
-            <p key={item._id} style={{ margin: '5px 0' }}>
-              {item.name}: Only {item.stock} left (Threshold: {item.threshold})
-            </p>
+            <p key={item._id} style={{ margin: '5px 0' }}>{item.name}: Only {item.stock} left (Threshold: {item.threshold})</p>
           ))}
         </div>
       )}
       
-      {/* Tabs */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
-        <button 
-          onClick={() => setActiveTab('inventory')} 
-          style={{ 
-            padding: '10px 20px', 
-            backgroundColor: activeTab === 'inventory' ? '#ff4d4d' : '#f0f0f0', 
-            color: activeTab === 'inventory' ? 'white' : '#333',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer'
-          }}
-        >
+        <button onClick={() => setActiveTab('inventory')} style={{ padding: '10px 20px', backgroundColor: activeTab === 'inventory' ? '#E63946' : '#f0f0f0', color: activeTab === 'inventory' ? 'white' : '#333', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
           📦 Inventory Management ({inventory.length} items)
         </button>
-        <button 
-          onClick={() => setActiveTab('orders')} 
-          style={{ 
-            padding: '10px 20px', 
-            backgroundColor: activeTab === 'orders' ? '#ff4d4d' : '#f0f0f0', 
-            color: activeTab === 'orders' ? 'white' : '#333',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer'
-          }}
-        >
+        <button onClick={() => setActiveTab('orders')} style={{ padding: '10px 20px', backgroundColor: activeTab === 'orders' ? '#E63946' : '#f0f0f0', color: activeTab === 'orders' ? 'white' : '#333', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
           📋 All Orders ({orders.length})
         </button>
       </div>
       
-      {/* Inventory Tab */}
       {activeTab === 'inventory' && (
         <div>
           <h2>Inventory Stock</h2>
@@ -110,26 +84,11 @@ function AdminDashboard() {
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '10px' }}>
                 {inventory.filter(i => i.category === category).map(item => (
-                  <div key={item._id} style={{ 
-                    border: '1px solid #ddd', 
-                    padding: '15px', 
-                    borderRadius: '8px',
-                    backgroundColor: item.stock < item.threshold ? '#fff3f3' : 'white'
-                  }}>
+                  <div key={item._id} style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '8px', backgroundColor: item.stock < item.threshold ? '#fff3f3' : 'white' }}>
                     <strong>{item.name}</strong>
                     <p>Price: ₹{item.price}</p>
-                    <p>Stock: 
-                      <input 
-                        type="number" 
-                        value={item.stock} 
-                        onChange={(e) => updateStock(item._id, parseInt(e.target.value))}
-                        style={{ width: '80px', marginLeft: '10px', padding: '5px', borderRadius: '5px', border: '1px solid #ddd' }}
-                      />
-                    </p>
-                    <p style={{ color: item.stock < item.threshold ? 'red' : 'green' }}>
-                      Threshold: {item.threshold}
-                      {item.stock < item.threshold && ' ⚠️ LOW STOCK'}
-                    </p>
+                    <p>Stock: <input type="number" value={item.stock} onChange={(e) => updateStock(item._id, parseInt(e.target.value))} style={{ width: '80px', marginLeft: '10px', padding: '5px', borderRadius: '5px', border: '1px solid #ddd' }} /></p>
+                    <p style={{ color: item.stock < item.threshold ? 'red' : 'green' }}>Threshold: {item.threshold} {item.stock < item.threshold && '⚠️ LOW STOCK'}</p>
                   </div>
                 ))}
               </div>
@@ -138,7 +97,6 @@ function AdminDashboard() {
         </div>
       )}
       
-      {/* Orders Tab */}
       {activeTab === 'orders' && (
         <div>
           <h2>Customer Orders</h2>
@@ -146,31 +104,19 @@ function AdminDashboard() {
             <p>No orders yet</p>
           ) : (
             orders.map(order => (
-              <div key={order._id} style={{ border: '1px solid #ddd', borderRadius: '10px', padding: '15px', marginBottom: '15px' }}>
+              <div key={order._id} style={{ border: '1px solid #ddd', borderRadius: '10px', padding: '15px', marginBottom: '15px', background: 'white' }}>
                 <p><strong>Order ID:</strong> {order._id}</p>
                 <p><strong>Date:</strong> {new Date(order.orderDate).toLocaleString()}</p>
                 <p><strong>Total:</strong> ₹{order.totalAmount}</p>
                 <p><strong>Address:</strong> {order.deliveryAddress?.street}, {order.deliveryAddress?.city}</p>
                 <p><strong>Phone:</strong> {order.deliveryAddress?.phone}</p>
                 
-                {/* Order Items */}
                 {order.menuItems && order.menuItems.length > 0 && (
-                  <div>
-                    <strong>Items:</strong>
-                    {order.menuItems.map((item, i) => (
-                      <p key={i}>• {item.name} x {item.quantity}</p>
-                    ))}
-                  </div>
+                  <div><strong>Items:</strong>{order.menuItems.map((item, i) => (<p key={i}>• {item.name} x {item.quantity}</p>))}</div>
                 )}
                 
-                {/* Status Update */}
-                <p>
-                  <strong>Status:</strong>
-                  <select 
-                    value={order.status} 
-                    onChange={(e) => changeOrderStatus(order._id, e.target.value)}
-                    style={{ marginLeft: '10px', padding: '5px', borderRadius: '5px', cursor: 'pointer' }}
-                  >
+                <p><strong>Status:</strong>
+                  <select value={order.status} onChange={(e) => changeOrderStatus(order._id, e.target.value)} style={{ marginLeft: '10px', padding: '5px', borderRadius: '5px', cursor: 'pointer' }}>
                     <option value="pending">Pending</option>
                     <option value="confirmed">Confirmed</option>
                     <option value="preparing">Preparing</option>

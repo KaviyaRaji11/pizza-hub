@@ -7,7 +7,6 @@ function MyOrders() {
 
   useEffect(() => {
     loadOrders();
-    // Auto-refresh every 5 seconds to get status updates
     const interval = setInterval(loadOrders, 5000);
     return () => clearInterval(interval);
   }, []);
@@ -23,19 +22,17 @@ function MyOrders() {
     }
   };
 
-  // Status color mapping
   const getStatusColor = (status) => {
     switch(status) {
-      case 'pending': return '#ff9800'; // Orange
-      case 'confirmed': return '#2196f3'; // Blue
-      case 'preparing': return '#9c27b0'; // Purple
-      case 'out_for_delivery': return '#4caf50'; // Green
-      case 'delivered': return '#2e7d32'; // Dark Green
+      case 'pending': return '#ff9800';
+      case 'confirmed': return '#2196f3';
+      case 'preparing': return '#9c27b0';
+      case 'out_for_delivery': return '#4caf50';
+      case 'delivered': return '#2e7d32';
       default: return '#666';
     }
   };
 
-  // Status icon mapping
   const getStatusIcon = (status) => {
     switch(status) {
       case 'pending': return '⏳';
@@ -47,7 +44,6 @@ function MyOrders() {
     }
   };
 
-  // Status text mapping
   const getStatusText = (status) => {
     switch(status) {
       case 'pending': return 'Order Received';
@@ -59,7 +55,6 @@ function MyOrders() {
     }
   };
 
-  // Progress percentage
   const getProgress = (status) => {
     switch(status) {
       case 'pending': return 20;
@@ -72,12 +67,12 @@ function MyOrders() {
   };
 
   if (loading) {
-    return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>Loading orders...</h2>;
+    return <h2 style={{ textAlign: 'center', marginTop: '50px', background: '#FFFFFF', minHeight: '100vh', padding: '20px' }}>Loading orders...</h2>;
   }
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '30px' }}>📦 My Orders</h1>
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px', background: '#FFFFFF', minHeight: '100vh' }}>
+      <h1 style={{ textAlign: 'center', marginBottom: '30px', color: '#E63946' }}>📦 My Orders</h1>
       
       {orders.length === 0 ? (
         <p style={{ textAlign: 'center' }}>No orders yet. Build your first pizza!</p>
@@ -113,28 +108,11 @@ function MyOrders() {
             <p><strong>Address:</strong> {order.deliveryAddress?.street}, {order.deliveryAddress?.city}</p>
             <p><strong>Phone:</strong> {order.deliveryAddress?.phone}</p>
             
-            {/* Progress Bar */}
             <div style={{ margin: '15px 0' }}>
-              <div style={{ 
-                backgroundColor: '#e0e0e0', 
-                borderRadius: '10px', 
-                height: '10px',
-                overflow: 'hidden'
-              }}>
-                <div style={{ 
-                  width: `${getProgress(order.status)}%`,
-                  backgroundColor: '#ff4d4d',
-                  height: '100%',
-                  transition: 'width 0.5s ease'
-                }} />
+              <div style={{ backgroundColor: '#e0e0e0', borderRadius: '10px', height: '10px', overflow: 'hidden' }}>
+                <div style={{ width: `${getProgress(order.status)}%`, backgroundColor: '#E63946', height: '100%', transition: 'width 0.5s ease' }} />
               </div>
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                marginTop: '8px',
-                fontSize: '10px',
-                color: '#666'
-              }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '10px', color: '#666' }}>
                 <span>Order Received</span>
                 <span>Confirmed</span>
                 <span>In Kitchen</span>
@@ -143,19 +121,15 @@ function MyOrders() {
               </div>
             </div>
             
-            {/* Order Items */}
             {order.menuItems && order.menuItems.length > 0 && (
               <div style={{ marginTop: '10px' }}>
                 <strong>🍕 Items:</strong>
                 {order.menuItems.map((item, i) => (
-                  <p key={i} style={{ margin: '5px 0 0 15px' }}>
-                    • {item.name} x {item.quantity}
-                  </p>
+                  <p key={i} style={{ margin: '5px 0 0 15px' }}>• {item.name} x {item.quantity}</p>
                 ))}
               </div>
             )}
             
-            {/* Custom Pizza Details */}
             {order.customPizza && order.customPizza.base?.name !== 'Regular Pizza' && (
               <div style={{ marginTop: '10px' }}>
                 <strong>🍕 Custom Pizza:</strong>

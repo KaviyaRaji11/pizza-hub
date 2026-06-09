@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createOrder, createPaymentOrder, verifyPayment } from '../services/api';
+import { createOrder } from '../services/api';
 
 function Cart({ cart, setCart }) {
 
@@ -11,9 +11,7 @@ function Cart({ cart, setCart }) {
 
   const increaseQuantity = (pizzaName) => {
     const updatedCart = cart.map((item) =>
-      item.name === pizzaName
-        ? { ...item, quantity: item.quantity + 1 }
-        : item
+      item.name === pizzaName ? { ...item, quantity: item.quantity + 1 } : item
     );
     setCart(updatedCart);
   };
@@ -21,9 +19,7 @@ function Cart({ cart, setCart }) {
   const decreaseQuantity = (pizzaName) => {
     const updatedCart = cart
       .map((item) =>
-        item.name === pizzaName
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
+        item.name === pizzaName ? { ...item, quantity: item.quantity - 1 } : item
       )
       .filter((item) => item.quantity > 0);
     setCart(updatedCart);
@@ -43,19 +39,7 @@ function Cart({ cart, setCart }) {
     }
   };
 
-  // Load Razorpay script
-  const loadRazorpayScript = () => {
-    return new Promise((resolve) => {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  };
-
-  // Handle Payment
-  const handlePayment = async () => {
+  const handlePlaceOrder = async () => {
     if (name === '' || address === '' || phone === '') {
       alert('Fill all details');
       return;
@@ -67,83 +51,40 @@ function Cart({ cart, setCart }) {
     }
 
     try {
-      // Create Razorpay order
-      const orderRes = await createPaymentOrder(finalTotal);
-      const { id: order_id, amount } = orderRes.data;
-      
-      // Load Razorpay script
-      const isLoaded = await loadRazorpayScript();
-      if (!isLoaded) {
-        alert('Failed to load payment gateway');
-        return;
-      }
-      
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_4X4JpLQyRS8nTw',
-        amount: amount,
-        currency: 'INR',
-        name: 'PizzaHub',
-        description: 'Pizza Order',
-        order_id: order_id,
-        handler: async (response) => {
-          // Verify payment
-          const verifyRes = await verifyPayment({
-            order_id: response.razorpay_order_id,
-            payment_id: response.razorpay_payment_id,
-            signature: response.razorpay_signature
-          });
-          
-          if (verifyRes.data.success) {
-            // Save order to database
-            const orderData = {
-              customPizza: {
-                base: { name: 'Regular Pizza', price: 0 },
-                sauce: { name: 'Standard', price: 0 },
-                cheese: { name: 'Mozzarella', price: 0 },
-                veggies: [],
-                meats: []
-              },
-              totalAmount: finalTotal,
-              deliveryAddress: { street: address, city: name, phone: phone },
-              menuItems: cart.map(item => ({
-                name: item.name,
-                quantity: item.quantity,
-                price: item.price
-              }))
-            };
-            
-            await createOrder(orderData);
-            alert('Payment Successful! Order placed successfully! 🎉');
-            
-            setCart([]);
-            setName('');
-            setAddress('');
-            setPhone('');
-          } else {
-            alert('Payment verification failed');
-          }
+      const orderData = {
+        customPizza: {
+          base: { name: 'Regular Pizza', price: 0 },
+          sauce: { name: 'Standard', price: 0 },
+          cheese: { name: 'Mozzarella', price: 0 },
+          veggies: [],
+          meats: []
         },
-        prefill: {
-          name: name,
-          contact: phone
-        },
-        theme: {
-          color: '#ff4d4d'
-        }
+        totalAmount: finalTotal,
+        deliveryAddress: { street: address, city: name, phone: phone },
+        menuItems: cart.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price
+        }))
       };
       
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
+      await createOrder(orderData);
+      alert('Order Placed Successfully! 🎉');
+      
+      setCart([]);
+      setName('');
+      setAddress('');
+      setPhone('');
       
     } catch (error) {
-      console.error('Payment error:', error);
-      alert('Payment failed: ' + (error.response?.data?.message || error.message));
+      console.error('Error:', error);
+      alert('Failed to place order: ' + (error.response?.data?.message || error.message));
     }
   };
 
   if (cart.length === 0) {
     return (
-      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', textAlign: 'center' }}>
+      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', background: '#FFFFFF', minHeight: '100vh', textAlign: 'center' }}>
         <h1>🛒 Your Cart</h1>
         <p>No pizzas added. Go to Menu!</p>
       </div>
@@ -151,7 +92,7 @@ function Cart({ cart, setCart }) {
   }
 
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
+    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', background: '#FFFFFF', minHeight: '100vh' }}>
       <h1 style={{ textAlign: 'center' }}>🛒 Your Cart</h1>
 
       {cart.map((item, index) => (
@@ -162,11 +103,12 @@ function Cart({ cart, setCart }) {
           marginBottom: '15px',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          background: 'white'
         }}>
           <div>
             <h3 style={{ margin: 0 }}>{item.name}</h3>
-            <p style={{ margin: '5px 0', color: '#ff4d4d', fontWeight: 'bold' }}>₹{item.price}</p>
+            <p style={{ margin: '5px 0', color: '#E63946', fontWeight: 'bold' }}>₹{item.price}</p>
           </div>
           <div>
             <button onClick={() => decreaseQuantity(item.name)} style={{ padding: '5px 10px', margin: '0 5px', cursor: 'pointer' }}>➖</button>
@@ -186,7 +128,7 @@ function Cart({ cart, setCart }) {
             onChange={(e) => setCoupon(e.target.value)}
             style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #ddd' }}
           />
-          <button onClick={applyCoupon} style={{ padding: '10px 20px', backgroundColor: '#ff4d4d', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+          <button onClick={applyCoupon} style={{ padding: '10px 20px', backgroundColor: '#E63946', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
             Apply
           </button>
         </div>
@@ -197,7 +139,7 @@ function Cart({ cart, setCart }) {
         <h3>Delivery: ₹{deliveryCharge}</h3>
         <h3>GST (5%): ₹{gst}</h3>
         <h3>Discount: ₹{discount}</h3>
-        <h2 style={{ color: '#ff4d4d' }}>Final Total: ₹{finalTotal}</h2>
+        <h2 style={{ color: '#E63946' }}>Final Total: ₹{finalTotal}</h2>
 
         <hr style={{ margin: '15px 0' }} />
 
@@ -225,11 +167,11 @@ function Cart({ cart, setCart }) {
         />
 
         <button
-          onClick={handlePayment}
+          onClick={handlePlaceOrder}
           style={{
             width: '100%',
             padding: '15px',
-            backgroundColor: '#ff4d4d',
+            backgroundColor: '#E63946',
             color: 'white',
             border: 'none',
             borderRadius: '8px',
@@ -238,7 +180,7 @@ function Cart({ cart, setCart }) {
             cursor: 'pointer'
           }}
         >
-          Place Order 💳
+          Place Order 🍕
         </button>
       </div>
     </div>

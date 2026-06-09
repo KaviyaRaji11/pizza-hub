@@ -5,12 +5,12 @@ function Menu() {
   const navigate = useNavigate();
 
   const categories = [
-    { id: 'vegetarian', name: 'Vegetarian', color: '#4CAF50', description: '7 delicious veg pizzas' },
-    { id: 'nonVegetarian', name: 'Non-Veg', color: '#ff9800', description: '7 meat lovers pizzas' },
-    { id: 'vegan', name: 'Vegan', color: '#8bc34a', description: '6 plant-based pizzas' },
-    { id: 'jain', name: 'Jain', color: '#ffc107', description: '5 no onion-garlic pizzas' },
-    { id: 'pescetarian', name: 'Pescetarian', color: '#2196f3', description: '6 seafood pizzas' },
-    { id: 'customized', name: 'Custom', color: '#9c27b0', description: 'Build your own' }
+    { id: 'vegetarian', name: 'Vegetarian', description: '7 veg pizzas' },
+    { id: 'nonVegetarian', name: 'Non-Veg', description: '7 meat pizzas' },
+    { id: 'vegan', name: 'Vegan', description: '6 plant pizzas' },
+    { id: 'jain', name: 'Jain', description: '5 jain pizzas' },
+    { id: 'pescetarian', name: 'Pescetarian', description: '6 seafood pizzas' },
+    { id: 'customized', name: 'Custom', description: 'Build your own' }
   ];
 
   const handleClick = (categoryId) => {
@@ -22,19 +22,42 @@ function Menu() {
   };
 
   return (
-    <div style={{ width: '100%', padding: '20px', boxSizing: 'border-box' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '10px', fontSize: '28px' }}>🍕 Pizza Categories</h1>
-      <p style={{ textAlign: 'center', color: '#666', marginBottom: '30px' }}>Choose your favorite category</p>
+    <div style={{ 
+      background: '#FFFFFF', 
+      minHeight: '100vh', 
+      padding: '30px 20px'
+    }}>
+      <h1 style={{ 
+        textAlign: 'center', 
+        marginBottom: '10px', 
+        fontSize: '28px', 
+        color: '#E63946' 
+      }}>
+        🍕 Pizza Categories
+      </h1>
+      <p style={{ 
+        textAlign: 'center', 
+        color: '#666', 
+        marginBottom: '30px',
+        fontSize: '14px'
+      }}>
+        Choose your favorite category
+      </p>
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
+        gridTemplateColumns: 'repeat(3, 300px)',
+        justifyContent: 'center',
         gap: '20px',
         maxWidth: '1000px',
         margin: '0 auto'
       }}>
         {categories.map(cat => (
-          <CategoryCard key={cat.id} category={cat} onClick={() => handleClick(cat.id)} />
+          <CategoryCard 
+            key={cat.id} 
+            category={cat} 
+            onClick={() => handleClick(cat.id)} 
+          />
         ))}
       </div>
     </div>

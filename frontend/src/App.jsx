@@ -24,23 +24,28 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import { testBackend } from './services/api';
 
-// Component to handle verification links
 function VerificationHandler() {
   const location = useLocation();
 
   useEffect(() => {
     const path = location.pathname;
     
-    // Email verification
-    if (path.startsWith('/verify/')) {
-      const token = path.split('/verify/')[1];
-      fetch(`http://localhost:5001/api/auth/verify/${token}`)
-        .then(res => res.json())
-        .then(data => {
-          alert(data.message);
-          window.location.href = '/';
+    if (path.startsWith('/reset-password/')) {
+      const token = path.split('/reset-password/')[1];
+      const newPassword = prompt('Enter your new password:');
+      if (newPassword) {
+        fetch(`http://localhost:5001/api/auth/reset-password/${token}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: newPassword })
         })
-        .catch(err => alert('Verification failed'));
+          .then(res => res.json())
+          .then(data => {
+            alert(data.message);
+            window.location.href = '/';
+          })
+          .catch(err => alert('Reset failed'));
+      }
     }
   }, [location]);
 
@@ -50,7 +55,12 @@ function VerificationHandler() {
 function App() {
 
   const [showLogin, setShowLogin] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Check localStorage for existing user on app load
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    return token && user ? true : false;
+  });
   const [cart, setCart] = useState([]);
   const [favorites, setFavorites] = useState(() => {
     const savedFavorites = localStorage.getItem('favorites');
@@ -106,7 +116,7 @@ function App() {
   return (
     <BrowserRouter>
       <VerificationHandler />
-      <nav style={{ display: 'flex', gap: '20px', padding: '20px', flexWrap: 'wrap' }}>
+      <nav style={{ display: 'flex', gap: '20px', padding: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
         <Link to="/">Home</Link>
         <Link to="/menu">Menu 🍕</Link>
         <Link to="/cart">Cart ({cart.length})</Link>
@@ -116,7 +126,12 @@ function App() {
         {user.role === 'admin' && (
           <Link to="/admin">Admin Dashboard 👑</Link>
         )}
-        <button onClick={() => setIsLoggedIn(false)}>Logout</button>
+        <Link to="/custom-pizza">Custom Pizza 🎨</Link>
+        <button onClick={() => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setIsLoggedIn(false);
+        }}>Logout</button>
       </nav>
 
       <Routes>

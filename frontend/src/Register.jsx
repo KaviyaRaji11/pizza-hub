@@ -4,181 +4,82 @@ function Register({ setShowLogin }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
-  const [verificationCode, setVerificationCode] = useState('');
-  const [enteredCode, setEnteredCode] = useState('');
+  const [code, setCode] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
 
-  // Step 1: Send verification email
-  const sendVerificationEmail = async () => {
-    if (!email) {
-      setMessage('Please enter email');
+  const sendCode = async () => {
+    if (!name || !email) {
+      setMessage('Please enter name and email');
       return;
     }
-
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5001/api/auth/send-verification', {
+      const res = await fetch('http://localhost:5001/api/auth/send-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, name })
       });
-      const data = await response.json();
-      
-      if (response.ok) {
-        setMessage('Verification code sent to your email!');
+      const data = await res.json();
+      if (res.ok) {
+        setMessage('Verification code sent! Check your email.');
         setStep(2);
       } else {
         setMessage(data.message);
       }
-    } catch (error) {
-      setMessage('Error sending verification');
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      setMessage('Error sending code');
     }
+    setLoading(false);
   };
 
-  // Step 2: Verify code
-  const verifyCode = async () => {
-    if (!enteredCode) {
-      setMessage('Please enter verification code');
+  const verifyAndRegister = async () => {
+    if (!code || !password) {
+      setMessage('Please enter code and password');
       return;
     }
-
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5001/api/auth/verify-code', {
+      const res = await fetch('http://localhost:5001/api/auth/verify-and-register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code: enteredCode })
+        body: JSON.stringify({ email, code, name, password })
       });
-      const data = await response.json();
-      
-      if (response.ok) {
-        setMessage('Email verified! Now set your password.');
-        setIsEmailVerified(true);
-        setStep(3);
+      const data = await res.json();
+      if (res.ok) {
+        setMessage('Registration successful! Please login.');
+        setTimeout(() => setShowLogin(true), 2000);
       } else {
         setMessage(data.message);
       }
-    } catch (error) {
-      setMessage('Error verifying code');
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      setMessage('Registration failed');
     }
-  };
-
-  // Step 3: Complete registration
-  const handleRegister = async () => {
-  if (!name || !email || !password) {
-    setMessage('Please fill all fields');
-    return;
-  }
-
-  setLoading(true);
-  try {
-    const response = await fetch('https://pizza-api-8plw.onrender.com/api/auth/register-simple', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password })
-    });
-    const data = await response.json();
-    
-    if (response.ok) {
-      setMessage('Registration successful! Please login.');
-      setTimeout(() => setShowLogin(true), 2000);
-    } else {
-      setMessage(data.message);
-    }
-  } catch (error) {
-    setMessage('Registration failed');
-  } finally {
     setLoading(false);
-  }
-};
-   
+  };
 
   return (
     <div className="login-container">
       <div className="login-form">
         <h1>Register 🍕</h1>
-
-        {/* Step 1: Enter Email */}
-        {step === 1 && (
+        {step === 1 ? (
           <>
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <button onClick={sendVerificationEmail} disabled={loading}>
-              {loading ? 'Sending...' : 'Send Verification Email'}
-            </button>
+            <input type="text" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />
+            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <button onClick={sendCode} disabled={loading}>{loading ? 'Sending...' : 'Send Verification Code'}</button>
+          </>
+        ) : (
+          <>
+            <p style={{ textAlign: 'center' }}>Code sent to: <strong>{email}</strong></p>
+            <input type="text" placeholder="Enter 6-digit code" value={code} onChange={(e) => setCode(e.target.value)} required />
+            <input type="password" placeholder="Create Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <button onClick={verifyAndRegister} disabled={loading}>{loading ? 'Registering...' : 'Verify & Register'}</button>
+            <p className="register-text" onClick={sendCode} style={{ fontSize: '12px' }}>Resend Code</p>
           </>
         )}
-
-        {/* Step 2: Enter Verification Code */}
-        {step === 2 && (
-          <>
-            <p style={{ color: '#666', textAlign: 'center' }}>
-              We sent a verification code to:<br/>
-              <strong>{email}</strong>
-            </p>
-            <input
-              type="text"
-              placeholder="Enter 6-digit verification code"
-              value={enteredCode}
-              onChange={(e) => setEnteredCode(e.target.value)}
-              required
-            />
-            <button onClick={verifyCode} disabled={loading}>
-              {loading ? 'Verifying...' : 'Verify Email'}
-            </button>
-            <p 
-              className="register-text" 
-              onClick={sendVerificationEmail}
-              style={{ fontSize: '12px', cursor: 'pointer' }}
-            >
-              Resend Code
-            </p>
-          </>
-        )}
-
-        {/* Step 3: Set Password */}
-        {step === 3 && (
-          <>
-            <p style={{ color: 'green', textAlign: 'center' }}>
-              ✅ Email Verified! Now set your password.
-            </p>
-            <input
-              type="password"
-              placeholder="Create Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <button onClick={handleRegister} disabled={loading}>
-              {loading ? 'Registering...' : 'Complete Registration'}
-            </button>
-          </>
-        )}
-
-        {message && <p style={{color: message.includes('successful') || message.includes('sent') ? 'green' : 'red'}}>{message}</p>}
-        
-        <p className="register-text" onClick={() => setShowLogin(true)}>
-          Already have an account? Login
-        </p>
+        {message && <p style={{ color: message.includes('successful') ? 'green' : 'red' }}>{message}</p>}
+        <p className="register-text" onClick={() => setShowLogin(true)}>Already have an account? Login</p>
       </div>
     </div>
   );

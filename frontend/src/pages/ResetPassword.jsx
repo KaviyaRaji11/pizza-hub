@@ -11,7 +11,6 @@ function ResetPassword() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Optional: Verify token is valid before showing form
     const verifyToken = async () => {
       try {
         const response = await fetch(`http://localhost:5001/api/auth/verify-reset-token/${token}`);

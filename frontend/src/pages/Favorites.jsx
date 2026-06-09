@@ -1,22 +1,21 @@
 function Favorites({ favorites, setFavorites }) {
   
   const removeFromFavorites = (pizza) => {
-  setFavorites(favorites.filter(fav => fav.name !== pizza.name));
-  // No alert
-};
+    setFavorites(favorites.filter(fav => fav.name !== pizza.name));
+  };
 
   if (favorites.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px' }}>
-        <h1>❤️ Favorites</h1>
+      <div style={{ textAlign: 'center', padding: '50px', background: '#FFFFFF', minHeight: '100vh' }}>
+        <h1 style={{ color: '#E63946' }}>❤️ Favorites</h1>
         <p>No favorites yet. Click the heart icon on any pizza to add it here!</p>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '30px' }}>❤️ Your Favorite Pizzas</h1>
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px', background: '#FFFFFF', minHeight: '100vh' }}>
+      <h1 style={{ textAlign: 'center', marginBottom: '30px', color: '#E63946' }}>❤️ Your Favorite Pizzas</h1>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
         {favorites.map((pizza, index) => (
@@ -28,16 +27,16 @@ function Favorites({ favorites, setFavorites }) {
               borderRadius: '12px',
               boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
               overflow: 'hidden',
-              minHeight: '150px'
+              minHeight: '150px',
+              border: '1px solid #f0f0f0'
             }}
           >
-            {/* Left Side - Pizza Info */}
             <div style={{ flex: 2, padding: '15px 20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                 <span style={{ fontSize: '20px' }}>🍕</span>
-                <h3 style={{ margin: 0, fontSize: '18px' }}>{pizza.name}</h3>
+                <h3 style={{ margin: 0, fontSize: '18px', color: '#E63946' }}>{pizza.name}</h3>
                 <span style={{ 
-                  backgroundColor: pizza.isVeg ? '#4CAF50' : '#ff9800', 
+                  backgroundColor: pizza.isVeg ? '#4CAF50' : '#E63946', 
                   color: 'white', 
                   padding: '2px 8px', 
                   borderRadius: '4px', 
@@ -50,12 +49,11 @@ function Favorites({ favorites, setFavorites }) {
               <p style={{ color: '#666', fontSize: '13px', margin: '0 0 8px 0' }}>
                 {pizza.description}
               </p>
-              <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#ff4d4d', margin: 0 }}>
+              <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#E63946', margin: 0 }}>
                 ₹{pizza.price}
               </p>
             </div>
 
-            {/* Right Side - Remove Button */}
             <div style={{
               width: '120px',
               backgroundColor: '#fafafa',
@@ -68,7 +66,7 @@ function Favorites({ favorites, setFavorites }) {
               <button
                 onClick={() => removeFromFavorites(pizza)}
                 style={{
-                  backgroundColor: '#ff4d4d',
+                  backgroundColor: '#E63946',
                   color: 'white',
                   border: 'none',
                   padding: '10px 20px',
