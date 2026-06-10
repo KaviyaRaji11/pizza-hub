@@ -23,7 +23,7 @@ import CustomPizza from './pages/CustomPizza';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import { testBackend } from './services/api';
-
+import PizzaDetail from './pages/PizzaDetail';
 function VerificationHandler() {
   const location = useLocation();
 
@@ -92,6 +92,7 @@ function App() {
       <BrowserRouter>
         <VerificationHandler />
         <Routes>
+          <Route path="/pizza/:id" element={<PizzaDetail cart={cart} setCart={setCart} favorites={favorites} setFavorites={setFavorites} />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="*" element={
@@ -107,6 +108,7 @@ function App() {
                 />
               )}
             </div>
+            
           } />
         </Routes>
       </BrowserRouter>

@@ -132,18 +132,20 @@ function CategoryPage({ cart, setCart, favorites, setFavorites }) {
             const ingredients = getIngredients(pizza.name);
             const reviews = getCustomerReviews(pizza.name);
             return (
-              <div 
-                key={pizza._id} 
-                style={{
-                  display: 'flex',
-                  backgroundColor: 'white',
-                  borderRadius: '12px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                  overflow: 'hidden',
-                  minHeight: '220px',
-                  border: '1px solid #f0f0f0'
-                }}
-              >
+             <div 
+  key={pizza._id} 
+  onClick={() => navigate(`/pizza/${pizza._id}`)}
+  style={{
+    display: 'flex',
+    backgroundColor: 'white',
+    borderRadius: '12px',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+    overflow: 'hidden',
+    minHeight: '220px',
+    border: '1px solid #f0f0f0',
+    cursor: 'pointer'
+  }}
+>
                 {/* LEFT SIDE - Name, Description, Ingredients, Rating, Reviews */}
                 <div style={{ flex: 2, padding: '15px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>

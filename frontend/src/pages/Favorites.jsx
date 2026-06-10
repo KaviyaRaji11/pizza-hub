@@ -43,6 +43,21 @@ function Favorites({ favorites, setFavorites }) {
                   fontSize: '11px',
                   fontWeight: 'bold'
                 }}>
+                  <div 
+  key={pizza._id} 
+  onClick={() => navigate(`/pizza/${pizza._id}`)}
+  style={{
+    display: 'flex',
+    backgroundColor: 'white',
+    borderRadius: '12px',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+    overflow: 'hidden',
+    minHeight: '150px',
+    cursor: 'pointer'
+  }}
+>
+  {/* rest of your favorite card code */}
+</div>
                   {pizza.isVeg ? 'VEG' : 'NON-VEG'}
                 </span>
               </div>
@@ -63,6 +78,7 @@ function Favorites({ favorites, setFavorites }) {
               justifyContent: 'center',
               padding: '15px'
             }}>
+              
               <button
                 onClick={() => removeFromFavorites(pizza)}
                 style={{
