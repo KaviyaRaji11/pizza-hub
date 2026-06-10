@@ -7,11 +7,16 @@ dotenv.config();
 
 const app = express();
 
+// Updated CORS configuration - Allow all origins
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 app.use(express.json());
 
@@ -27,9 +32,9 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/pizzas', require('./routes/pizzas'));
 app.use('/api/payment', require('./routes/payment'));
 
-// Local MongoDB connection (for development on your computer)
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB Atlas Connected'))
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/pizza_db')
+  .then(() => console.log('✅ MongoDB Connected'))
   .catch(err => console.log('❌ MongoDB Error:', err));
 
 const PORT = process.env.PORT || 5001;
