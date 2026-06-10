@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'https://pizza-api.onrender.com/api',  // ← Your cloud backend
+  baseURL: 'https://pizza-api-nbsx.onrender.com/api',  // ← Your cloud backend
 });
 
 API.interceptors.request.use((req) => {
