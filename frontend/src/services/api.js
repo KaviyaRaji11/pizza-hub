@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Use the live backend URL
 const API = axios.create({
-  baseURL: 'https://pizza-frontend-3ij6.onrender.com/api',
+  baseURL: 'https://pizza-api.onrender.com/api',  // ← Your BACKEND URL
 });
 
 // Add token to every request
