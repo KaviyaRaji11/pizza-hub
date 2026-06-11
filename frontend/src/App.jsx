@@ -52,10 +52,10 @@ function App() {
   const [showLogin, setShowLogin] = useState(true);
   // Check localStorage for existing user on app load
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    return token && user ? true : false;
-  });
+  const token = localStorage.getItem('token');
+  const user = localStorage.getItem('user');
+  return token && user ? true : false;
+});
   const [cart, setCart] = useState([]);
   const [favorites, setFavorites] = useState([]);
 
