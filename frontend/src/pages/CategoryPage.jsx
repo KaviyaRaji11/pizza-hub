@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { pizzaImages } from '../assets/images';
-import { useNavigate } from 'react-router-dom';
+
 function CategoryPage({ cart, setCart, favorites, setFavorites }) {
   const { categoryId } = useParams();
   const navigate = useNavigate();
   const [pizzas, setPizzas] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const categoryNames = {
     vegetarian: 'Vegetarian Pizzas',
     nonVegetarian: 'Non-Veg Pizzas',
@@ -33,7 +33,8 @@ function CategoryPage({ cart, setCart, favorites, setFavorites }) {
     }
   };
 
-  const addToCart = (pizza) => {
+  const addToCart = (pizza, event) => {
+    event.stopPropagation();
     const existing = cart.find(item => item.name === pizza.name);
     if (existing) {
       setCart(cart.map(item =>
@@ -45,14 +46,30 @@ function CategoryPage({ cart, setCart, favorites, setFavorites }) {
     alert(`${pizza.name} added to cart! 🍕`);
   };
 
-  const toggleFavorite = (pizza) => {
-    const exists = favorites.find(fav => fav.name === pizza.name);
-    if (exists) {
-      setFavorites(favorites.filter(fav => fav.name !== pizza.name));
+  const toggleFavorite = async (pizza, event) => {
+  event.stopPropagation();
+  const token = localStorage.getItem('token');
+  const isFavorite = favorites.find(fav => fav._id === pizza._id);
+  
+  try {
+    if (isFavorite) {
+      await fetch(`http://localhost:5001/api/auth/favorites/${pizza._id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setFavorites(favorites.filter(fav => fav._id !== pizza._id));
     } else {
+      await fetch('http://localhost:5001/api/auth/favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ pizza })
+      });
       setFavorites([...favorites, pizza]);
     }
-  };
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
 
   const getRatingStars = (rating) => {
     const fullStars = Math.floor(rating);
@@ -67,10 +84,7 @@ function CategoryPage({ cart, setCart, favorites, setFavorites }) {
       'Veggie Supreme': 'Capsicum, Onion, Tomato, Mushroom, Olives, Corn',
       'Paneer Tikka': 'Paneer, Tikka Masala, Capsicum, Onion',
       'Pepperoni': 'Pepperoni, Mozzarella, Tomato Sauce',
-      'Chicken Tikka': 'Chicken Tikka, Capsicum, Onion',
-      'Vegan Margherita': 'Vegan Cheese, Tomato Sauce, Basil',
-      'Jain Margherita': 'Jain Cheese, Jain Tomato Sauce',
-      'Tuna Pizza': 'Tuna, Onion, Olives'
+      'Chicken Tikka': 'Chicken Tikka, Capsicum, Onion'
     };
     return ingredientsMap[pizzaName] || 'Fresh ingredients';
   };
@@ -81,10 +95,7 @@ function CategoryPage({ cart, setCart, favorites, setFavorites }) {
       'Veggie Supreme': ['"Loaded with fresh veggies!" - Mike', '"My go-to veg pizza!" - Priya'],
       'Paneer Tikka': ['"Indian flavors on pizza!" - Raj', '"Paneer was perfectly spiced!" - Anita'],
       'Pepperoni': ['"Spicy and perfect!" - Tony', '"Best pepperoni in town!" - Nick'],
-      'Chicken Tikka': ['"Tikka flavor is authentic!" - Vikram', '"Better than restaurant!" - Neha'],
-      'Vegan Margherita': ['"Can\'t tell it\'s vegan!" - Emma', '"Cheese is amazing!" - Oliver'],
-      'Jain Margherita': ['"Finally no onion garlic!" - Jain', '"Pure and delicious!" - Ramesh'],
-      'Tuna Pizza': ['"Fresh tuna taste!" - Fisher', '"Better than canned!" - Sam']
+      'Chicken Tikka': ['"Tikka flavor is authentic!" - Vikram', '"Better than restaurant!" - Neha']
     };
     return reviewsMap[pizzaName] || ['"Absolutely delicious!" - Customer', '"Highly recommended!" - Foodie'];
   };
@@ -132,21 +143,21 @@ function CategoryPage({ cart, setCart, favorites, setFavorites }) {
             const ingredients = getIngredients(pizza.name);
             const reviews = getCustomerReviews(pizza.name);
             return (
-             <div 
-  key={pizza._id} 
-  onClick={() => navigate(`/pizza/${pizza._id}`)}
-  style={{
-    display: 'flex',
-    backgroundColor: 'white',
-    borderRadius: '12px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-    overflow: 'hidden',
-    minHeight: '220px',
-    border: '1px solid #f0f0f0',
-    cursor: 'pointer'
-  }}
->
-                {/* LEFT SIDE - Name, Description, Ingredients, Rating, Reviews */}
+              <div 
+                key={pizza._id}
+                onClick={() => navigate(`/pizza/${pizza._id}`)}
+                style={{
+                  display: 'flex',
+                  backgroundColor: 'white',
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  overflow: 'hidden',
+                  minHeight: '220px',
+                  border: '1px solid #f0f0f0',
+                  cursor: 'pointer'
+                }}
+              >
+                {/* LEFT SIDE */}
                 <div style={{ flex: 2, padding: '15px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
@@ -180,7 +191,7 @@ function CategoryPage({ cart, setCart, favorites, setFavorites }) {
                   </div>
                 </div>
 
-                {/* RIGHT SIDE - Image, Heart, Price, Add to Cart */}
+                {/* RIGHT SIDE */}
                 <div style={{
                   width: '200px',
                   backgroundColor: '#fafafa',
@@ -190,9 +201,8 @@ function CategoryPage({ cart, setCart, favorites, setFavorites }) {
                   padding: '15px',
                   position: 'relative'
                 }}>
-                  {/* Heart Icon */}
                   <button
-                    onClick={() => toggleFavorite(pizza)}
+                    onClick={(e) => toggleFavorite(pizza, e)}
                     style={{
                       position: 'absolute',
                       top: '10px',
@@ -235,7 +245,7 @@ function CategoryPage({ cart, setCart, favorites, setFavorites }) {
                   </p>
 
                   <button
-                    onClick={() => addToCart(pizza)}
+                    onClick={(e) => addToCart(pizza, e)}
                     style={{
                       backgroundColor: '#E63946',
                       color: 'white',
@@ -257,7 +267,6 @@ function CategoryPage({ cart, setCart, favorites, setFavorites }) {
         </div>
       )}
 
-      {/* Bottom Back Button */}
       <div style={{ textAlign: 'center', marginTop: '30px' }}>
         <button 
           onClick={() => navigate('/menu')} 

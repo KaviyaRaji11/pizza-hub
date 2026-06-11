@@ -3,8 +3,8 @@ const router = express.Router();
 const Razorpay = require('razorpay');
 
 const razorpay = new Razorpay({
-  key_id: 'rzp_test_SzdDSSaq6K5LVU',
-  key_secret: 'nJhJR8RPQUVoqt4a5UVPqbx1'
+  key_id: 'rzp_test_T0FDYlctiaTuLS',
+  key_secret: '9uS8167fmx0dDEV24Sb5Ab5v'
 });
 
 router.post('/create-order', async (req, res) => {
@@ -18,6 +18,7 @@ router.post('/create-order', async (req, res) => {
     const order = await razorpay.orders.create(options);
     res.json(order);
   } catch (error) {
+    console.error('Razorpay error:', error);
     res.status(500).json({ error: error.message });
   }
 });

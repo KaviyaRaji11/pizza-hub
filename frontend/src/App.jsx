@@ -22,30 +22,25 @@ import CategoryPage from './pages/CategoryPage';
 import CustomPizza from './pages/CustomPizza';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import { testBackend } from './services/api';
 import PizzaDetail from './pages/PizzaDetail';
+import { testBackend } from './services/api';
+
 function VerificationHandler() {
   const location = useLocation();
 
   useEffect(() => {
     const path = location.pathname;
     
-    if (path.startsWith('/reset-password/')) {
-      const token = path.split('/reset-password/')[1];
-      const newPassword = prompt('Enter your new password:');
-      if (newPassword) {
-        fetch(`http://localhost:5001/api/auth/reset-password/${token}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password: newPassword })
+    // Email verification only - no popup for reset password
+    if (path.startsWith('/verify/')) {
+      const token = path.split('/verify/')[1];
+      fetch(`http://localhost:5001/api/auth/verify/${token}`)
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message);
+          window.location.href = '/';
         })
-          .then(res => res.json())
-          .then(data => {
-            alert(data.message);
-            window.location.href = '/';
-          })
-          .catch(err => alert('Reset failed'));
-      }
+        .catch(err => alert('Verification failed'));
     }
   }, [location]);
 
@@ -62,10 +57,26 @@ function App() {
     return token && user ? true : false;
   });
   const [cart, setCart] = useState([]);
-  const [favorites, setFavorites] = useState(() => {
-    const savedFavorites = localStorage.getItem('favorites');
-    return savedFavorites ? JSON.parse(savedFavorites) : [];
-  });
+  const [favorites, setFavorites] = useState([]);
+
+// Load favorites from database when user logs in
+useEffect(() => {
+  const loadFavorites = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const res = await fetch('http://localhost:5001/api/auth/favorites', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        setFavorites(data);
+      } catch (err) {
+        console.error('Error loading favorites:', err);
+      }
+    }
+  };
+  loadFavorites();
+}, [isLoggedIn]);
   const [orders, setOrders] = useState(() => {
     const savedOrders = localStorage.getItem('orders');
     return savedOrders ? JSON.parse(savedOrders) : [];
@@ -107,7 +118,6 @@ function App() {
                 />
               )}
             </div>
-            
           } />
         </Routes>
       </BrowserRouter>
@@ -118,22 +128,22 @@ function App() {
     <BrowserRouter>
       <VerificationHandler />
       <nav style={{ display: 'flex', gap: '20px', padding: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
-        <Link to="/">Home</Link>
-        <Link to="/menu">Menu 🍕</Link>
-        <Link to="/cart">Cart ({cart.length})</Link>
-        <Link to="/my-orders">My Orders 📦</Link>
-        <Link to="/about">About</Link>
-        <Link to="/favorites">Favorites ({favorites.length})</Link>
-        {user.role === 'admin' && (
-          <Link to="/admin">Admin Dashboard 👑</Link>
-        )}
-        <Link to="/custom-pizza">Custom Pizza 🎨</Link>
-        <button onClick={() => {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          setIsLoggedIn(false);
-        }}>Logout</button>
-      </nav>
+  <Link to="/">Home</Link>
+  <Link to="/menu">Menu 🍕</Link>
+  <Link to="/custom-pizza">Custom Pizza 🎨</Link>
+  <Link to="/favorites">Favorites ({favorites.length})</Link>
+  <Link to="/cart">Cart ({cart.length})</Link>
+  <Link to="/my-orders">My Orders 📦</Link>
+  <Link to="/about">About</Link>
+  {user.role === 'admin' && (
+    <Link to="/admin">Admin Dashboard 👑</Link>
+  )}
+  <button onClick={() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsLoggedIn(false);
+  }}>Logout</button>
+</nav>
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -144,10 +154,11 @@ function App() {
         <Route path="/favorites" element={<Favorites favorites={favorites} setFavorites={setFavorites} />} />
         <Route path="/admin" element={user.role === 'admin' ? <AdminDashboard /> : <Navigate to="/" />} />
         <Route path="/category/:categoryId" element={<CategoryPage cart={cart} setCart={setCart} favorites={favorites} setFavorites={setFavorites} />} />
-        <Route path="/custom-pizza" element={<CustomPizza cart={cart} setCart={setCart} />} />
+        <Route path="/custom-pizza" element={<CustomPizza cart={cart} setCart={setCart} favorites={favorites} setFavorites={setFavorites} />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/pizza/:id" element={<PizzaDetail cart={cart} setCart={setCart} favorites={favorites} setFavorites={setFavorites} />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/pizza/:id" element={<PizzaDetail cart={cart} setCart={setCart} favorites={favorites} setFavorites={setFavorites} />} />
+        
       </Routes>
     </BrowserRouter>
   );

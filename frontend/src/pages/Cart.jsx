@@ -50,7 +50,8 @@ function Cart({ cart, setCart }) {
   };
 
   const handlePayment = async () => {
-    console.log('Payment started');
+    console.log('🟢 Payment started');
+    console.log('Cart items:', cart);
     
     if (name === '' || address === '' || phone === '') {
       alert('Fill all details');
@@ -64,10 +65,7 @@ function Cart({ cart, setCart }) {
 
     try {
       // Create Razorpay order
-      console.log('Creating order for amount:', finalTotal);
       const orderRes = await createPaymentOrder(finalTotal);
-      console.log('Order response:', orderRes.data);
-      
       const { id: order_id, amount } = orderRes.data;
       
       // Load Razorpay script
@@ -78,21 +76,26 @@ function Cart({ cart, setCart }) {
       }
       
       const options = {
-        key: 'rzp_test_SzdDSSaq6K5LVU',
+        key: 'rzp_test_T0FDYlctiaTuLS',
         amount: amount,
         currency: 'INR',
         name: 'PizzaHub',
         description: 'Pizza Order',
         order_id: order_id,
         handler: async (response) => {
-          console.log('Payment success:', response);
+          console.log('🟢 Payment success:', response);
+          
+          // Verify payment
           const verifyRes = await verifyPayment({
             order_id: response.razorpay_order_id,
             payment_id: response.razorpay_payment_id,
             signature: response.razorpay_signature
           });
           
+          console.log('🟢 Verification response:', verifyRes.data);
+          
           if (verifyRes.data.success) {
+            // Prepare order data with menu items and quantities
             const orderData = {
               customPizza: {
                 base: { name: 'Regular Pizza', price: 0 },
@@ -110,13 +113,20 @@ function Cart({ cart, setCart }) {
               }))
             };
             
-            await createOrder(orderData);
+            console.log('🟢 Sending order to backend:', orderData);
+            
+            // Save order to database (this will reduce stock)
+            const orderResult = await createOrder(orderData);
+            console.log('🟢 Order saved:', orderResult.data);
+            
             alert('Payment Successful! Order placed successfully! 🎉');
             
+            // Clear cart
             setCart([]);
             setName('');
             setAddress('');
             setPhone('');
+            
           } else {
             alert('Payment verification failed');
           }
@@ -127,11 +137,6 @@ function Cart({ cart, setCart }) {
         },
         theme: {
           color: '#E63946'
-        },
-        modal: {
-          ondismiss: function() {
-            console.log('Payment modal closed');
-          }
         }
       };
       
@@ -139,7 +144,7 @@ function Cart({ cart, setCart }) {
       razorpay.open();
       
     } catch (error) {
-      console.error('Payment error:', error);
+      console.error('🔴 Payment error:', error);
       alert('Payment failed: ' + error.message);
     }
   };

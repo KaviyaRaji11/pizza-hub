@@ -16,17 +16,5 @@ const pizzaSchema = new mongoose.Schema({
   ingredients: [{ type: String }],
   rating: { type: Number, default: 4.5 }
 });
-// Get single pizza by ID
-router.get('/:id', async (req, res) => {
-  try {
-    const pizza = await Pizza.findById(req.params.id);
-    if (!pizza) {
-      return res.status(404).json({ message: 'Pizza not found' });
-    }
-    res.json(pizza);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
 
 module.exports = mongoose.model('Pizza', pizzaSchema);

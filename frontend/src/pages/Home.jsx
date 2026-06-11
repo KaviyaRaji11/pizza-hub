@@ -1,81 +1,71 @@
 import { useNavigate } from 'react-router-dom';
-import pizzaImage from '../assets/pizza.jpeg';
 
 function Home() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ 
-      minHeight: 'calc(100vh - 70px)',
+    <div style={{
+      minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '20px',
       background: '#FFFFFF'
     }}>
-      <h1 style={{ 
-        fontSize: '42px', 
-        color: '#E63946',
-        marginBottom: '15px',
-        textAlign: 'center'
-      }}>
-        🍕 PizzaHub
-      </h1>
-      
-      <p style={{ 
-        fontSize: '18px', 
-        color: '#666',
-        marginBottom: '25px',
-        textAlign: 'center'
-      }}>
-        Hot & Fresh Pizzas Delivered To Your Doorstep
-      </p>
-      
-      {/* Pizza Image - Smaller and compact */}
+      {/* Full width image section */}
       <div style={{
-        maxWidth: '450px',
         width: '100%',
-        margin: '0 auto',
-        borderRadius: '15px',
-        overflow: 'hidden',
-        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)'
-      }}>
-        <img 
-          src={pizzaImage} 
-          alt="Delicious Pizza" 
-          style={{
-            width: '100%',
-            height: 'auto',
-            display: 'block',
-            aspectRatio: '16/9',
-            objectFit: 'cover'
-          }}
-        />
-      </div>
+        height: '40vh',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1200&h=600&fit=crop)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }} />
       
-      {/* Order Now Button - Below image */}
-      <button 
-        onClick={() => navigate('/menu')}
-        style={{
-          backgroundColor: '#E63946',
-          color: 'white',
-          border: 'none',
-          padding: '12px 35px',
-          fontSize: '16px',
-          fontWeight: 'bold',
-          borderRadius: '50px',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-          marginTop: '25px',
-          boxShadow: '0 4px 12px rgba(230, 57, 70, 0.3)'
-        }}
-        onMouseDown={(e) => e.target.style.transform = 'scale(0.95)'}
-        onMouseUp={(e) => e.target.style.transform = 'scale(1)'}
-        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-      >
-        Order Now 🍕
-      </button>
+      {/* Content below image - REDUCED SPACE */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '15px 20px 30px 20px',
+        textAlign: 'center'
+      }}>
+        <h1 style={{ 
+          fontSize: '42px', 
+          color: '#E63946',
+          marginBottom: '8px'
+        }}>
+          🍕 PizzaHub
+        </h1>
+        
+        <p style={{ 
+          fontSize: '16px', 
+          color: '#666',
+          marginBottom: '20px'
+        }}>
+          Hot & Fresh Pizzas Delivered To Your Doorstep
+        </p>
+        
+        <button 
+          onClick={() => navigate('/menu')}
+          style={{
+            backgroundColor: '#E63946',
+            color: 'white',
+            border: 'none',
+            padding: '12px 40px',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            borderRadius: '50px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            boxShadow: '0 4px 12px rgba(230, 57, 70, 0.3)'
+          }}
+          onMouseDown={(e) => e.target.style.transform = 'scale(0.95)'}
+          onMouseUp={(e) => e.target.style.transform = 'scale(1)'}
+          onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+        >
+          Order Now 🍕
+        </button>
+      </div>
     </div>
   );
 }

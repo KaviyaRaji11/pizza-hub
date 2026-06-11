@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { pizzaImages } from '../assets/images';
+import { createOrder, createPaymentOrder, verifyPayment } from '../services/api';
 
 function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
   const { id } = useParams();
@@ -14,15 +15,37 @@ function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
   }, [id]);
 
   const fetchPizza = async () => {
-    try {
-      const response = await fetch(`https://pizza-api.onrender.com/api/pizzas/${id}`);
-      const data = await response.json();
-      setPizza(data);
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
+  try {
+    // First check if it's a custom pizza (starts with 'custom_')
+    if (id && id.startsWith('custom_')) {
+      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+      const customPizza = favorites.find(fav => fav._id === id);
+      if (customPizza) {
+        setPizza(customPizza);
+        setLoading(false);
+        return;
+      }
     }
+    
+    // Otherwise fetch from API
+    const response = await fetch(`http://localhost:5001/api/pizzas/${id}`);
+    const data = await response.json();
+    setPizza(data);
+  } catch (error) {
+    console.error('Error:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
   };
 
   const addToCart = () => {
@@ -37,9 +60,70 @@ function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
     alert(`${pizza.name} added to cart! 🍕`);
   };
 
-  const buyNow = () => {
-    addToCart();
-    navigate('/cart');
+  const buyNow = async () => {
+    const totalAmount = pizza.price * quantity;
+    
+    try {
+      const orderRes = await createPaymentOrder(totalAmount);
+      const { id: order_id, amount } = orderRes.data;
+      
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        alert('Failed to load payment gateway');
+        return;
+      }
+      
+      const options = {
+  key: 'rzp_test_T0FDYlctiaTuLS',  // ← Update this
+  amount: amount,
+  currency: 'INR',
+  name: 'PizzaHub',
+  description: pizza.name,
+  order_id: order_id,
+        handler: async (response) => {
+          const verifyRes = await verifyPayment({
+            order_id: response.razorpay_order_id,
+            payment_id: response.razorpay_payment_id,
+            signature: response.razorpay_signature
+          });
+          
+          if (verifyRes.data.success) {
+            const orderData = {
+              customPizza: {
+                base: { name: 'Regular Pizza', price: 0 },
+                sauce: { name: 'Standard', price: 0 },
+                cheese: { name: 'Mozzarella', price: 0 },
+                veggies: [],
+                meats: []
+              },
+              totalAmount: totalAmount,
+              deliveryAddress: { street: 'Store Pickup', city: 'PizzaHub', phone: '0000000000' },
+              menuItems: [{ name: pizza.name, quantity: quantity, price: pizza.price }]
+            };
+            
+            await createOrder(orderData);
+            alert('Payment Successful! Order placed successfully! 🎉');
+            navigate('/my-orders');
+          } else {
+            alert('Payment verification failed');
+          }
+        },
+        prefill: {
+          name: 'Customer',
+          contact: '9999999999'
+        },
+        theme: {
+          color: '#E63946'
+        }
+      };
+      
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+      
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('Payment failed: ' + error.message);
+    }
   };
 
   const toggleFavorite = () => {
@@ -63,7 +147,7 @@ function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
   };
 
   if (loading) {
-    return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>Loading...</h2>;
+    return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>Loading pizza details...</h2>;
   }
 
   if (!pizza) {
@@ -90,7 +174,6 @@ function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
       </button>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px' }}>
-        {/* Left Side - Large Image */}
         <div style={{ flex: 1, minWidth: '300px' }}>
           <img
             src={getPizzaImage()}
@@ -103,7 +186,6 @@ function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
           />
         </div>
 
-        {/* Right Side - Details */}
         <div style={{ flex: 1, minWidth: '300px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h1 style={{ color: '#E63946', fontSize: '32px' }}>{pizza.name}</h1>
@@ -144,6 +226,11 @@ function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
           <div style={{ marginBottom: '25px' }}>
             <h3>Description</h3>
             <p style={{ color: '#555', lineHeight: '1.6' }}>{pizza.description}</p>
+          </div>
+
+          <div style={{ marginBottom: '25px' }}>
+            <h3>Ingredients</h3>
+            <p style={{ color: '#555' }}>Fresh dough, premium cheese, signature sauce, and the finest toppings</p>
           </div>
 
           <div style={{ marginBottom: '25px' }}>

@@ -136,5 +136,68 @@ router.get('/verify-reset-token/:token', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+// ========== FAVORITES APIs ==========
+
+// Get user favorites
+router.get('/favorites', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    const decoded = jwt.verify(token, 'mysecretkey');
+    const user = await User.findById(decoded.userId);
+    res.json(user.favorites || []);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Add to favorites
+router.post('/favorites', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    const decoded = jwt.verify(token, 'mysecretkey');
+    const { pizza } = req.body;
+    
+    const user = await User.findById(decoded.userId);
+    const exists = user.favorites.find(f => f._id === pizza._id);
+    
+    if (!exists) {
+      user.favorites.push(pizza);
+      await user.save();
+    }
+    
+    res.json(user.favorites);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Remove from favorites
+router.delete('/favorites/:id', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    const decoded = jwt.verify(token, 'mysecretkey');
+    const { id } = req.params;
+    
+    const user = await User.findById(decoded.userId);
+    user.favorites = user.favorites.filter(f => f._id !== id);
+    await user.save();
+    
+    res.json(user.favorites);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 module.exports = router;
