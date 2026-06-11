@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { pizzaImages } from '../assets/images';
-
+import { useNavigate } from 'react-router-dom';
 function CategoryPage({ cart, setCart, favorites, setFavorites }) {
   const { categoryId } = useParams();
   const navigate = useNavigate();
   const [pizzas, setPizzas] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  
   const categoryNames = {
     vegetarian: 'Vegetarian Pizzas',
     nonVegetarian: 'Non-Veg Pizzas',

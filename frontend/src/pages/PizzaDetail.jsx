@@ -52,7 +52,7 @@ function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
   };
 
   const getPizzaImage = () => {
-    return pizzaImages[pizza.name] || pizzaImages.default;
+    return pizzaImages[pizza?.name] || pizzaImages.default;
   };
 
   const getRatingStars = (rating) => {
@@ -86,11 +86,11 @@ function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
           marginBottom: '20px'
         }}
       >
-        ← Back
+        ← Back to Menu
       </button>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px' }}>
-        {/* Left Side - Image */}
+        {/* Left Side - Large Image */}
         <div style={{ flex: 1, minWidth: '300px' }}>
           <img
             src={getPizzaImage()}
@@ -105,7 +105,6 @@ function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
 
         {/* Right Side - Details */}
         <div style={{ flex: 1, minWidth: '300px' }}>
-          {/* Title and Favorite */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h1 style={{ color: '#E63946', fontSize: '32px' }}>{pizza.name}</h1>
             <button
@@ -121,7 +120,6 @@ function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
             </button>
           </div>
 
-          {/* Veg/Non-Veg Badge */}
           <span style={{
             backgroundColor: pizza.isVeg ? '#4CAF50' : '#E63946',
             color: 'white',
@@ -134,32 +132,20 @@ function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
             {pizza.isVeg ? 'VEGETARIAN' : 'NON-VEGETARIAN'}
           </span>
 
-          {/* Price */}
           <h2 style={{ fontSize: '28px', color: '#E63946', marginBottom: '15px' }}>
             ₹{pizza.price}
           </h2>
 
-          {/* Rating */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
             <span style={{ fontSize: '18px' }}>{getRatingStars(pizza.rating || 4.5)}</span>
             <span style={{ color: '#666' }}>({Math.floor(Math.random() * 500) + 100} reviews)</span>
           </div>
 
-          {/* Description */}
           <div style={{ marginBottom: '25px' }}>
             <h3>Description</h3>
             <p style={{ color: '#555', lineHeight: '1.6' }}>{pizza.description}</p>
           </div>
 
-          {/* Ingredients */}
-          <div style={{ marginBottom: '25px' }}>
-            <h3>Ingredients</h3>
-            <p style={{ color: '#555' }}>
-              Fresh dough, premium cheese, signature sauce, and the finest toppings
-            </p>
-          </div>
-
-          {/* Quantity Selector */}
           <div style={{ marginBottom: '25px' }}>
             <h3>Quantity</h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
@@ -195,7 +181,6 @@ function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
             </div>
           </div>
 
-          {/* Total Price */}
           <div style={{ marginBottom: '25px' }}>
             <h3>Total Amount</h3>
             <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#E63946' }}>
@@ -203,7 +188,6 @@ function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
             </p>
           </div>
 
-          {/* Action Buttons */}
           <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
             <button
               onClick={addToCart}

@@ -92,7 +92,6 @@ function App() {
       <BrowserRouter>
         <VerificationHandler />
         <Routes>
-          <Route path="/pizza/:id" element={<PizzaDetail cart={cart} setCart={setCart} favorites={favorites} setFavorites={setFavorites} />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="*" element={
@@ -147,6 +146,7 @@ function App() {
         <Route path="/category/:categoryId" element={<CategoryPage cart={cart} setCart={setCart} favorites={favorites} setFavorites={setFavorites} />} />
         <Route path="/custom-pizza" element={<CustomPizza cart={cart} setCart={setCart} />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/pizza/:id" element={<PizzaDetail cart={cart} setCart={setCart} favorites={favorites} setFavorites={setFavorites} />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </BrowserRouter>
