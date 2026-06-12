@@ -7,6 +7,7 @@ dotenv.config();
 
 const app = express();
 
+// CORS configuration
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
   res.send('Backend is working!');
 });
 
+// Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/inventory', require('./routes/inventory'));
 app.use('/api/orders', require('./routes/orders'));
@@ -26,15 +28,13 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/pizzas', require('./routes/pizzas'));
 app.use('/api/payment', require('./routes/payment'));
 
-// MongoDB connection - USE ATLAS
-const MONGODB_URI = process.env.MONGODB_URI;
-console.log('MONGODB_URI exists?', MONGODB_URI ? 'YES' : 'NO');
-
+// MongoDB connection
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/pizza_db';
 mongoose.connect(MONGODB_URI)
-  .then(() => console.log('✅ MongoDB Connected to Atlas'))
+  .then(() => console.log('✅ MongoDB Connected'))
   .catch(err => console.log('❌ MongoDB Error:', err));
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
