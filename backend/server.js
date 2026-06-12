@@ -7,7 +7,6 @@ dotenv.config();
 
 const app = express();
 
-// CORS configuration
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -28,9 +27,12 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/pizzas', require('./routes/pizzas'));
 app.use('/api/payment', require('./routes/payment'));
 
-// Local MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/pizza_db')
-  .then(() => console.log('✅ MongoDB Connected to Local Database'))
+// MongoDB connection - READ FROM ENV VARIABLE
+const MONGODB_URI = process.env.MONGODB_URI;
+console.log('MONGODB_URI exists?', MONGODB_URI ? 'YES' : 'NO');
+
+mongoose.connect(MONGODB_URI)
+  .then(() => console.log('✅ MongoDB Connected to Atlas'))
   .catch(err => console.log('❌ MongoDB Error:', err));
 
 const PORT = process.env.PORT || 5001;
