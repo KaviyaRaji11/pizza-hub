@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 const Pizza = require('./models/Pizza');
 
-mongoose.connect('mongodb://127.0.0.1:27017/pizza_db');
+require('dotenv').config();
+
+mongoose.connect(process.env.MONGODB_URI);
 
 const allPizzas = [
   // ========== VEGETARIAN (7) ==========

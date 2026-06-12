@@ -93,9 +93,10 @@ router.post('/forgot-password', async (req, res) => {
     const resetToken = crypto.randomBytes(32).toString('hex');
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpires = Date.now() + 3600000;
+   
     await user.save();
     
-    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+    const resetUrl = `https://pizza-frontend-rxyk.onrender.com/reset-password/${resetToken}`;
     await transporter.sendMail({
       to: email,
       subject: 'Reset Your Password - PizzaHub',
