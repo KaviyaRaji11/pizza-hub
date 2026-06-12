@@ -7,7 +7,12 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
   isVerified: { type: Boolean, default: true },
-  favorites: [{ type: Object, default: [] }],  // ← Add this line
+
+  // ✅ Add these two fields
+  resetPasswordToken: { type: String, default: null },
+  resetPasswordExpires: { type: Date, default: null },
+
+  favorites: [{ type: Object, default: [] }],
   createdAt: { type: Date, default: Date.now }
 });
 
