@@ -28,7 +28,7 @@ function PizzaDetail({ cart, setCart, favorites, setFavorites }) {
     }
     
     // Otherwise fetch from API
-    const response = await fetch(`http://localhost:5001/api/pizzas/${id}`);
+    const response = await fetch(`https://pizza-api-jktk.onrender.com/api/pizzas/${id}`);
     const data = await response.json();
     setPizza(data);
   } catch (error) {

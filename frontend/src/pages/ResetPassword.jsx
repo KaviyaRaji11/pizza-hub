@@ -13,7 +13,7 @@ function ResetPassword() {
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/auth/verify-reset-token/${token}`);
+        const response = await fetch(`https://pizza-api-jktk.onrender.com/api/auth/verify-reset-token/${token}`);
         if (!response.ok) {
           setValidToken(false);
           setMessage('Invalid or expired reset link. Please request a new one.');
@@ -43,8 +43,7 @@ function ResetPassword() {
     setMessage('');
 
     try {
-      const response = await fetch(`http://localhost:5001/api/auth/reset-password/${token}`, {
-        method: 'POST',
+      const response = await fetchfetch(`https://pizza-api-jktk.onrender.com/api/auth/reset-password/${token}`, {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
       });

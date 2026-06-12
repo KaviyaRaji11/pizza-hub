@@ -16,7 +16,7 @@ function Register({ setShowLogin }) {
     }
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5001/api/auth/send-verification', {
+      const res = await fetch('https://pizza-api-jktk.onrender.com/api/auth/send-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, name })
@@ -41,7 +41,7 @@ function Register({ setShowLogin }) {
     }
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5001/api/auth/verify-and-register', {
+      const res = await fetch('https://pizza-api-jktk.onrender.com/api/auth/verify-and-register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code, name, password })

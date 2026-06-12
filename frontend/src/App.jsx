@@ -34,7 +34,7 @@ function VerificationHandler() {
     // Email verification only - no popup for reset password
     if (path.startsWith('/verify/')) {
       const token = path.split('/verify/')[1];
-      fetch(`http://localhost:5001/api/auth/verify/${token}`)
+      fetchfetch(`https://pizza-api-jktk.onrender.com/api/auth/verify/${token}`)
         .then(res => res.json())
         .then(data => {
           alert(data.message);
@@ -65,7 +65,7 @@ useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        const res = await fetch('http://localhost:5001/api/auth/favorites', {
+        const res = await fetch('https://pizza-api-jktk.onrender.com/api/auth/favorites', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();

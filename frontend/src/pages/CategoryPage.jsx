@@ -23,7 +23,7 @@ function CategoryPage({ cart, setCart, favorites, setFavorites }) {
   const fetchPizzas = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/pizzas/category/${categoryId}`);
+      const response = await fetch(`https://pizza-api-jktk.onrender.com/api/pizzas/category/${categoryId}`);
       const data = await response.json();
       setPizzas(data);
     } catch (err) {
@@ -53,13 +53,13 @@ function CategoryPage({ cart, setCart, favorites, setFavorites }) {
   
   try {
     if (isFavorite) {
-      await fetch(`http://localhost:5001/api/auth/favorites/${pizza._id}`, {
+      await fetch(`https://pizza-api-jktk.onrender.com/api/auth/favorites/${pizza._id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
       setFavorites(favorites.filter(fav => fav._id !== pizza._id));
     } else {
-      await fetch('http://localhost:5001/api/auth/favorites', {
+      await fetch('https://pizza-api-jktk.onrender.com/api/auth/favorites', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ pizza })
