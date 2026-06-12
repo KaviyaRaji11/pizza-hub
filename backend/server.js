@@ -29,7 +29,7 @@ app.use('/api/pizzas', require('./routes/pizzas'));
 app.use('/api/payment', require('./routes/payment'));
 
 // Local MongoDB connection
-mongoose.connect('mongodb://127.0.0.1:27017/pizza_db')
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/pizza_db')
   .then(() => console.log('✅ MongoDB Connected to Local Database'))
   .catch(err => console.log('❌ MongoDB Error:', err));
 
