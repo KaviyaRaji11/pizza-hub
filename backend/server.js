@@ -19,7 +19,6 @@ app.get('/', (req, res) => {
   res.send('Backend is working!');
 });
 
-// Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/inventory', require('./routes/inventory'));
 app.use('/api/orders', require('./routes/orders'));
@@ -27,7 +26,7 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/pizzas', require('./routes/pizzas'));
 app.use('/api/payment', require('./routes/payment'));
 
-// MongoDB connection - READ FROM ENV VARIABLE
+// MongoDB connection - USE ATLAS
 const MONGODB_URI = process.env.MONGODB_URI;
 console.log('MONGODB_URI exists?', MONGODB_URI ? 'YES' : 'NO');
 
